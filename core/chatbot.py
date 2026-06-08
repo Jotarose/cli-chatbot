@@ -1,6 +1,5 @@
-import anthropic
-import openai
-from google import genai
+class ProviderError(Exception):
+    pass
 
 
 class FallbackChatbot:
@@ -24,13 +23,9 @@ class FallbackChatbot:
 
                 return
 
-            except (
-                openai.OpenAIError,
-                anthropic.AnthropicError,
-                genai.errors.APIError,
-            ) as e:
+            except ProviderError as e:
                 print(
-                    f"API error occurred while fetching response from {provider.__class__.__name__}: {e}\n- Will try next provider."
+                    f"\nAPI error en {provider.__class__.__name__}: {e}\n- Will try next provider."
                 )
             except Exception as e:
                 print(

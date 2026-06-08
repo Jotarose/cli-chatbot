@@ -1,4 +1,6 @@
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
+
+from core.chatbot import ProviderError
 
 
 class OpenAIProvider:
@@ -6,14 +8,17 @@ class OpenAIProvider:
         self.client = OpenAI(api_key=api_key)
 
     def generate_stream_response(self, history: list):
-        response = self.client.responses.create(
-            model="gpt-4o",
-            input=history,
-            stream=True,
-        )
+        try:
+            response = self.client.responses.create(
+                model="gpt-4o",
+                input=history,
+                stream=True,
+            )
 
-        for event in response:
-            if event.type == "response.output_text.delta":
-                text = event.delta.output_text
-                if text:
-                    yield text
+            for event in response:
+                if event.type == "response.output_text.delta":
+                    text = event.delta.text
+                    if text:
+                        yield text
+        except OpenAIError as e:
+            raise ProviderError(f"OpenAI API error: {e}")

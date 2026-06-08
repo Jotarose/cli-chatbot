@@ -1,5 +1,8 @@
 from google import genai
 from google.genai import types
+from google.genai.errors import APIError
+
+from core.chatbot import ProviderError
 
 
 class GeminiProvider:
@@ -28,12 +31,15 @@ class GeminiProvider:
                     }
                 )
 
-        response = self.client.models.generate_content_stream(
-            model="gemini-2.5-flash",
-            contents=gemini_history,
-            config=types.GenerateContentConfig(system_instruction=system_prompt),
-        )
+        try:
+            response = self.client.models.generate_content_stream(
+                model="gemini-2.5-flash",
+                contents=gemini_history,
+                config=types.GenerateContentConfig(system_instruction=system_prompt),
+            )
 
-        for chunk in response:
-            if chunk.text:
-                yield chunk.text
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+        except APIError as e:
+            raise ProviderError(f"Gemini API error: {e}")

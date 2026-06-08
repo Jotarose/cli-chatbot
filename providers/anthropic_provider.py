@@ -1,4 +1,6 @@
-from anthropic import Anthropic
+from anthropic import Anthropic, AnthropicError
+
+from core.chatbot import ProviderError
 
 
 class AnthropicProvider:
@@ -14,16 +16,19 @@ class AnthropicProvider:
             else:
                 clean_messages.append(msg)
 
-        response = self.client.messages.create(
-            max_tokens=1024,
-            model="claude-sonnet-4-0",
-            system=system_prompt,
-            messages=clean_messages,
-            stream=True,
-        )
+        try:
+            response = self.client.messages.create(
+                max_tokens=1024,
+                model="claude-sonnet-4-0",
+                system=system_prompt,
+                messages=clean_messages,
+                stream=True,
+            )
 
-        for event in response:
-            if event.type == "content_block_delta":
-                text = event.delta.text
-                if text:
-                    yield text
+            for event in response:
+                if event.type == "content_block_delta":
+                    text = event.delta.text
+                    if text:
+                        yield text
+        except AnthropicError as e:
+            raise ProviderError(f"Anthropic API error: {e}")
