@@ -1,3 +1,8 @@
+import anthropic
+import openai
+from google import genai
+
+
 class FallbackChatbot:
     def __init__(self, providers, conversation_manager):
         self.providers = providers
@@ -19,6 +24,14 @@ class FallbackChatbot:
 
                 return
 
+            except (
+                openai.OpenAIError,
+                anthropic.AnthropicError,
+                genai.errors.APIError,
+            ) as e:
+                print(
+                    f"API error occurred while fetching response from {provider.__class__.__name__}: {e}\n- Will try next provider."
+                )
             except Exception as e:
                 print(
                     f"Error occurred while fetching response from {provider.__class__.__name__}: {e}\n- Will try next provider."

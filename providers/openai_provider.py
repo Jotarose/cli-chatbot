@@ -14,6 +14,6 @@ class OpenAIProvider:
 
         for event in response:
             if event.type == "response.output_text.delta":
-                text = event.delta
+                text = event.delta.output_text
                 if text:
                     yield text
