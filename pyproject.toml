@@ -1,0 +1,12 @@
+[project]
+name = "cli-chatbot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.107.0",
+    "google-genai>=2.8.0",
+    "openai>=2.41.0",
+    "python-dotenv>=1.2.2",
+]
